@@ -6,7 +6,18 @@ import android.widget.ImageView
 import com.bumptech.glide.Glide
 import com.sf.votestreams.R
 
+// this will display the view and send actions to the viewmodel
+
+// mvvm
+// databinding
+// rxjava
+// dagger
+// glide
+// retrofit
+// moshi
+
 class HomeActivity : AppCompatActivity() {
+    private val homeViewModel = HomeViewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
