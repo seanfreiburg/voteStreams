@@ -3,12 +3,15 @@ package com.sf.votestreams.home
 import androidx.lifecycle.MutableLiveData
 import com.sf.votestreams.common.DisposableViewModel
 import com.sf.votestreams.home.dataModels.Post
-import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.Scheduler
 import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
+import javax.inject.Named
 
-class HomeViewModel @Inject constructor(private val model: HomeModel) : DisposableViewModel() {
+class HomeViewModel @Inject constructor(
+    private val model: HomeModel, private @Named("BACKGROUND") val backgroundThread: Scheduler,
+    private @Named("MAIN") val mainThread: Scheduler
+) : DisposableViewModel() {
 
     val isPostLoaded = MutableLiveData<Boolean>()
     val isLoadingPost = MutableLiveData<Boolean>()
@@ -27,8 +30,8 @@ class HomeViewModel @Inject constructor(private val model: HomeModel) : Disposab
         isLoadingPost.value = true
         val observable = model.getPost(1)
         val disposable = observable
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(backgroundThread)
+            .observeOn(mainThread)
             .subscribeBy(
                 onSuccess = {
                     post.value = it

@@ -3,9 +3,14 @@ package com.sf.votestreams.home
 import dagger.Component
 import dagger.Module
 import dagger.Provides
+import io.reactivex.Scheduler
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
+import javax.inject.Named
+import javax.inject.Singleton
 
 @Module
 class PostRetrofitServiceBuilder {
@@ -15,7 +20,7 @@ class PostRetrofitServiceBuilder {
     }
 
     @Provides
-    fun providesRetrofit(): Retrofit{
+    fun providesRetrofit(): Retrofit {
         return Retrofit.Builder()
             .baseUrl("https://jsonplaceholder.typicode.com")
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
@@ -24,7 +29,23 @@ class PostRetrofitServiceBuilder {
     }
 }
 
-@Component(modules = [PostRetrofitServiceBuilder::class])
+@Module
+class SchedulerBuilder {
+
+    @Provides
+    @Singleton
+    @Named("BACKGROUND")
+    fun providesBackgroundScheduler(): Scheduler = Schedulers.io()
+
+    @Provides
+    @Singleton
+    @Named("MAIN")
+    fun providesMainThreadScheduler(): Scheduler = AndroidSchedulers.mainThread()
+
+}
+
+@Singleton
+@Component(modules = [PostRetrofitServiceBuilder::class, SchedulerBuilder::class])
 interface HomeInjector {
     fun injectIntoActivity(app: HomeActivity)
 }
